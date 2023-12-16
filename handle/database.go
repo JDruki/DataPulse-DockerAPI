@@ -55,6 +55,7 @@ func (*DataHandler) GetUserDataBase(ctx *gin.Context) {
 	if ok {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
+		delete(req, "database")
 	} else {
 		// 处理类型断言失败的情况
 		fmt.Println("无法转换为 string 类型")
@@ -95,6 +96,7 @@ func (*DataHandler) SetUserDataBase(ctx *gin.Context) {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
 		delete(req, "id")
+		delete(req, "database")
 	} else {
 		// 处理类型断言失败的情况
 		fmt.Println("无法转换类型，请查看断言函数")
@@ -131,6 +133,7 @@ func (*DataHandler) DeleteUserDataBase(ctx *gin.Context) {
 	if ok {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
+		delete(req, "database")
 	} else {
 		// 处理类型断言失败的情况
 		fmt.Println("无法转换类型，请查看断言函数")
@@ -151,6 +154,8 @@ func (*DataHandler) DeleteUserDataBase(ctx *gin.Context) {
 	}
 	ctx.JSON(200, res.Success("删除成功"))
 }
+
+// InsetUserDataBase 动态插入
 func (*DataHandler) InsetUserDataBase(ctx *gin.Context) {
 	res := &Result{}
 	var req map[string]interface{}
@@ -165,6 +170,7 @@ func (*DataHandler) InsetUserDataBase(ctx *gin.Context) {
 	if ok {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
+		delete(req, "database")
 	} else {
 		// 处理类型断言失败的情况
 		fmt.Println("无法转换类型，请查看断言函数")
