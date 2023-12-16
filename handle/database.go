@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"Auto/dao"
 	"Auto/model"
 	"Auto/util"
 	"fmt"
@@ -49,7 +50,7 @@ func (*DataHandler) GetUserDataBase(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, res.Fail(400, "json数据错误！"))
 		return
 	}
-
+	DataBase, ok := req["database"].(string)
 	Table, ok := req["table_name"].(string)
 	if ok {
 		fmt.Println("断言成功")
@@ -58,6 +59,12 @@ func (*DataHandler) GetUserDataBase(ctx *gin.Context) {
 		// 处理类型断言失败的情况
 		fmt.Println("无法转换为 string 类型")
 		ctx.JSON(200, res.Fail(400, "断言失败"))
+		return
+	}
+	err := dao.InitDatabase(DataBase)
+	if err != nil {
+		fmt.Println("无法访问到这个数据库", err)
+		ctx.JSON(200, res.Fail(400, "无法访问到这个数据库，请重启服务或联系管理员"))
 		return
 	}
 	value, err := model.SearchUserDataBase(req, Table) // 这里用你的用户名调用了之前的函数
@@ -81,6 +88,7 @@ func (*DataHandler) SetUserDataBase(ctx *gin.Context) {
 	}
 	Table, ok := req["table_name"].(string)
 	IDCache, ok := req["id"].(float64)
+	DataBase, ok := req["database"].(string)
 	var ID int
 	if ok {
 		ID = int(IDCache)
@@ -93,7 +101,13 @@ func (*DataHandler) SetUserDataBase(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "断言失败"))
 		return
 	}
-	err := model.SetDataBase(req, Table, ID) // 这里用你的用户名调用了之前的函数
+	err := dao.InitDatabase(DataBase)
+	if err != nil {
+		fmt.Println("无法访问到这个数据库", err)
+		ctx.JSON(200, res.Fail(400, "无法访问到这个数据库，请重启服务或联系管理员"))
+		return
+	}
+	err = model.SetDataBase(req, Table, ID) // 这里用你的用户名调用了之前的函数
 	if err != nil {
 		fmt.Println("更新失败 - model异常", err)
 		ctx.JSON(200, res.Fail(400, "更新失败，请重启服务或联系管理员"))
@@ -113,6 +127,7 @@ func (*DataHandler) DeleteUserDataBase(ctx *gin.Context) {
 		return
 	}
 	Table, ok := req["table_name"].(string)
+	DataBase, ok := req["database"].(string)
 	if ok {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
@@ -122,7 +137,13 @@ func (*DataHandler) DeleteUserDataBase(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "断言失败"))
 		return
 	}
-	err := model.DeleteDataBase(req, Table)
+	err := dao.InitDatabase(DataBase)
+	if err != nil {
+		fmt.Println("无法访问到这个数据库", err)
+		ctx.JSON(200, res.Fail(400, "无法访问到这个数据库，请重启服务或联系管理员"))
+		return
+	}
+	err = model.DeleteDataBase(req, Table)
 	if err != nil {
 		fmt.Println("删除失败 - model异常", err)
 		ctx.JSON(200, res.Fail(400, "删除失败，请重启服务或联系管理员"))
@@ -140,6 +161,7 @@ func (*DataHandler) InsetUserDataBase(ctx *gin.Context) {
 		return
 	}
 	Table, ok := req["table_name"].(string)
+	DataBase, ok := req["database"].(string)
 	if ok {
 		fmt.Println("断言成功")
 		delete(req, "table_name") // 删除名为 table_name 的字段及其值
@@ -149,7 +171,13 @@ func (*DataHandler) InsetUserDataBase(ctx *gin.Context) {
 		ctx.JSON(200, res.Fail(400, "断言失败"))
 		return
 	}
-	err := model.InSetDataBase(req, Table)
+	err := dao.InitDatabase(DataBase)
+	if err != nil {
+		fmt.Println("无法访问到这个数据库", err)
+		ctx.JSON(200, res.Fail(400, "无法访问到这个数据库，请重启服务或联系管理员"))
+		return
+	}
+	err = model.InSetDataBase(req, Table)
 	if err != nil {
 		fmt.Println("插入失败 - model异常", err)
 		ctx.JSON(200, res.Fail(400, "插入新数据失败，请重启服务或联系管理员"))
