@@ -1,0 +1,63 @@
+on:
+  push:
+    branches:
+      - master # 触发条件：当代码推送到主分支时触发构建
+
+jobs:
+  build:
+    runs-on: matrix
+
+    steps:
+      - name: 发送开始推送通知
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: '${{ secrets.GOTIFY_API_BASE }}'
+          gotify_app_token: '${{ secrets.GOTIFY_API_KEY }}'
+          notification_title: '您的构建已开启'
+          notification_message: |
+            项目名: ${{ gitea.repository }}
+            提交: ${{ gitea.sha }}
+            构建次数: ${{ gitea.run_number }}
+            提交人: ${{ gitea.actor }}  
+                        
+      - name: 安装环境
+        run: |
+          apk add git
+
+      - name: 结算代码
+        uses: actions/checkout@v2
+
+      - name: 推送镜像到Github
+        run: |
+          echo "# DataPulse-DockerAPI" >> README.md
+          git clone https://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@github.com/JDruki/DataPulse-DockerAPI.git .
+          git commit -am "first commit"
+          git push
+
+        
+      - uses: actions/checkout@master
+      - name: 发送成功的通知
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: '${{ secrets.GOTIFY_API_BASE }}'
+          gotify_app_token: '${{ secrets.GOTIFY_API_KEY }}'
+          notification_title: '构建成功'
+          notification_message: |
+            项目名: ${{ gitea.repository }}
+            提交: ${{ gitea.sha }}
+            构建次数: ${{ gitea.run_number }}
+            提交人: ${{ gitea.actor }}             
+
+      # 添加一个步骤，仅在失败时触发
+      - name: 构建失败发送通知
+        if: failure()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: '${{ secrets.GOTIFY_API_BASE }}'
+          gotify_app_token: '${{ secrets.GOTIFY_API_KEY }}'
+          notification_title: '构建失败'
+          notification_message: |
+            项目名: ${{ gitea.repository }}
+            提交: ${{ gitea.sha }}
+            构建次数: ${{ gitea.run_number }}
+            提交人: ${{ gitea.actor }} 
